@@ -1,7 +1,5 @@
 package model;
 
-import java.util.List;
-
 public class Project {
 
     private Long id;
@@ -9,7 +7,6 @@ public class Project {
     private Course course;
     private Professor professor;
     private ProjectStatus status;
-    private List<ProjectParticipation> participations;
 
     public Project(Long id, String title, Course course, Professor professor) {
         this.id = id;
@@ -19,4 +16,32 @@ public class Project {
         this.status = ProjectStatus.ACTIVE;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public Professor getProfessor() {
+        return professor;
+    }
+
+    public ProjectStatus getStatus() {
+        return status;
+    }
+
+    @Override
+    public String toString() {
+        return "Project{id=" + id +
+                ", title='" + title + '\'' +
+                ", course=" + course.getName() +
+                ", professor=" + professor.getName() +
+                ", status=" + status + '}';
+    }
 }
