@@ -1,6 +1,6 @@
 # UES – ICCIS Academic Management System
 
-##  Descripción
+## Descripción
 
 Este proyecto consiste en el desarrollo de un **backend académico sencillo** para la **Universidad Élite Suramericana (UES)** en alianza con el **Instituto Colombiano de Ciencias e Investigación para la Salud (ICCIS)**.
 
@@ -13,11 +13,13 @@ El sistema busca modelar y administrar la información relacionada con:
 - Proyectos de investigación
 - Evaluaciones académicas
 
-El objetivo principal es diseñar un sistema **escalable y organizado**, aplicando **Patrones de Diseño Creacionales**, específicamente el patrón **Factory Method**.
+El objetivo principal es diseñar un sistema **escalable, organizado y mantenible**, aplicando **Patrones de Diseño de Software**.
+
+En la primera parte del proyecto se aplicó el patrón **Factory Method**, y en esta segunda parte se implementa el patrón estructural **Adapter** para integrar información externa.
 
 ---
 
-#  Objetivo del proyecto
+# Objetivo del proyecto
 
 Diseñar un sistema que permita representar las relaciones académicas entre estudiantes, profesores, cursos y proyectos de investigación, respetando las siguientes reglas del negocio:
 
@@ -30,51 +32,10 @@ Diseñar un sistema que permita representar las relaciones académicas entre est
 - Cada participación en un proyecto tiene una **calificación individual**.
 - Si **50% o más de las calificaciones son menores a 70**, el proyecto se **cierra automáticamente**.
 
----
-
-#  Arquitectura del proyecto
-
-El proyecto está organizado en diferentes paquetes para mantener una separación clara de responsabilidades.
-
-ues-system
-
-│
-├── model
-
-│ ├── Faculty
-
-│ ├── Course
-
-│ ├── Professor
-
-│ ├── Student
-
-│ ├── Project
-
-│ ├── ProjectParticipation
-
-│ ├── Country
-
-│ └── ProjectStatus
-│
-├── factory
-
-│ ├── UniversityFactory
-
-│ └── DefaultUniversityFactory
-
-│
-├── service
-
-│
-└── main
-
-└── Ap
-
+Además, el sistema debe poder **integrar información externa proveniente del ICCIS**, incluso cuando esa información tenga un formato diferente al utilizado por el sistema interno de la UES.
 
 ---
-
-#  Modelo de dominio
+# Modelo de dominio
 
 Las entidades principales del sistema son:
 
@@ -89,45 +50,45 @@ Las entidades principales del sistema son:
 | Country | Enum con el país de origen del estudiante |
 | ProjectStatus | Enum con el estado del proyecto |
 
+También se incorpora una clase externa que representa el formato de datos del ICCIS.
+
+| Clase | Descripción |
+|------|-------------|
+| ExternalIccisProject | Representa el formato externo de proyectos proporcionado por ICCIS |
+
 ---
 
-#  Relaciones principales
+# Relaciones principales
 
-Las relaciones del sistema están diseñadas de la siguiente manera:
+Las relaciones del sistema están diseñadas de la siguiente manera.
 
-### Faculty → Course
+## Faculty → Course
 Una facultad puede tener múltiples cursos.
 
-### Professor → Course
+## Professor → Course
 Un profesor puede dictar varios cursos.
 
-### Student ↔ Course
+## Student ↔ Course
 Un estudiante puede estar inscrito en múltiples cursos.
 
-### Professor → Project
-Cada profesor solo puede tener un proyecto.
+## Professor → Project
+Cada profesor solo puede tener un proyecto asociado.
 
-### Course → Project
+## Course → Project
 Cada proyecto pertenece a un curso.
 
-### Student ↔ Project
-Los estudiantes participan en proyectos a través de la entidad `ProjectParticipation`.
+## Student ↔ Project
+Los estudiantes participan en proyectos a través de la entidad **ProjectParticipation**.
 
 ---
 
-#  Patrón de diseño utilizado
+# Patrones de diseño utilizados
 
 ## Factory Method
 
-El patrón **Factory Method** permite centralizar la creación de objetos del dominio en una clase especializada llamada **Factory**.
+En la primera parte del proyecto se utilizó el patrón creacional **Factory Method**, el cual permite centralizar la creación de objetos del dominio.
 
-En este proyecto se implementa mediante:
-
-UniversityFactory
-DefaultUniversityFactory
-
-
-Esta fábrica es responsable de crear:
+La fábrica es responsable de crear:
 
 - estudiantes
 - profesores
@@ -138,53 +99,52 @@ Esto permite:
 
 - reducir el acoplamiento entre clases
 - centralizar reglas de negocio
-- facilitar cambios futuros en el sistema
+- facilitar modificaciones futuras
 
----
-
-#  Ejecución del proyecto
-
-La ejecución se realiza desde la clase principal:
-main.App
-
-Flujo básico del sistema:
-
-1. Crear una facultad.
-2. Crear un profesor mediante la fábrica.
-3. Crear un curso.
-4. Crear estudiantes.
-5. Crear un proyecto asociado a un curso y profesor.
-
----
-
-# 📌 Ejemplo de uso del Factory Method
+### Ejemplo de uso
 
 ```java
 UniversityFactory factory = new DefaultUniversityFactory();
 
 Professor professor = factory.createProfessor(
-    1L, 
-    "Carlos Ruiz", 
+    1L,
+    "Carlos Ruiz",
     "Investigacion"
 );
 
 Student student = factory.createStudent(
-    1L, 
-    "Ana", 
+    1L,
+    "Ana",
     Country.COLOMBIA
 );
 
-Course course = factory.createCourse(
-    1L, 
-    "Programacion", 
-    faculty
-);
+# Arquitectura del proyecto
 
-Project project = factory.createProject(
-    1L,
-    "Proyecto Amazonia",
-    course,
-    professor
-);
+El proyecto está organizado en diferentes paquetes para mantener una separación clara de responsabilidades.
 
-
+```text
+ues-system
+│
+├── model
+│   ├── Faculty.java
+│   ├── Course.java
+│   ├── Professor.java
+│   ├── Student.java
+│   ├── Project.java
+│   ├── ProjectParticipation.java
+│   ├── Country.java
+│   └── ProjectStatus.java
+│
+├── external
+│   └── ExternalIccisProject.java
+│
+├── adapter
+│   ├── IccisProjectTarget.java
+│   └── IccisProjectAdapter.java
+│
+├── factory
+│   ├── UniversityFactory.java
+│   └── DefaultUniversityFactory.java
+│
+└── main
+    └── App.java

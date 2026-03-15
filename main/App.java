@@ -3,26 +3,30 @@ package main;
 import factory.DefaultUniversityFactory;
 import factory.UniversityFactory;
 import model.*;
+package main;
+
+import adapter.IccisProjectAdapter;
+import adapter.IccisProjectTarget;
+import external.ExternalIccisProject;
 
 public class App {
 
     public static void main(String[] args) {
 
-        UniversityFactory factory = new DefaultUniversityFactory();
+        ExternalIccisProject externalProject =
+                new ExternalIccisProject(
+                        "ICCIS-101",
+                        "Amazonic Medicinal Plants Research",
+                        "Software Design",
+                        "Carlos Ruiz"
+                );
 
-        Faculty faculty = new Faculty(1L, "Ingenieria");
+        IccisProjectTarget adaptedProject = new IccisProjectAdapter(externalProject);
 
-        Professor professor = factory.createProfessor(1L, "Carlos Ruiz", "Investigacion");
-
-        Course course = factory.createCourse(1L, "Programacion", faculty);
-
-        Student s1 = factory.createStudent(1L, "Ana", Country.COLOMBIA);
-        Student s2 = factory.createStudent(2L, "Luis", Country.PERU);
-
-        Project project = factory.createProject(1L, "Proyecto Amazonia", course, professor);
-
-        System.out.println("Sistema creado correctamente");
-
+        System.out.println("Proyecto adaptado al sistema UES:");
+        System.out.println("ID: " + adaptedProject.getProjectId());
+        System.out.println("Titulo: " + adaptedProject.getProjectTitle());
+        System.out.println("Curso: " + adaptedProject.getCourseName());
+        System.out.println("Profesor: " + adaptedProject.getProfessorName());
     }
-
 }
