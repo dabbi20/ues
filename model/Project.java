@@ -9,6 +9,16 @@ public class Project implements Observer {
     private String title;
     private List<ProjectParticipation> participations;
     private ProjectStatus status;
+    private List<ProjectParticipation> participations;
+    private ProjectStatus status;
+
+    public List<ProjectParticipation> getParticipations() {
+        return participations;
+    }
+
+    public void setStatus(ProjectStatus status) {
+        this.status = status;
+    }
 
     public Project(Long id, String title, List<ProjectParticipation> participations) {
         this.id = id;

@@ -1,19 +1,22 @@
 package model;
 
-public class ProjectParticipation {
+import observer.Subject;
 
-    private Student student;
-    private Project project;
+public class ProjectParticipation extends Subject {
+
     private double grade;
 
-    public ProjectParticipation(Student student, Project project, double grade) {
-        this.student = student;
-        this.project = project;
+    public ProjectParticipation(double grade) {
         this.grade = grade;
+    }
+
+
+    public void setGrade(double grade) {
+        this.grade = grade;
+        notifyObservers(); // 🔥 clave
     }
 
     public boolean isLowGrade() {
         return grade < 70;
     }
-
 }

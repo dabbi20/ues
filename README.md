@@ -15,7 +15,9 @@ El sistema busca modelar y administrar la información relacionada con:
 
 El objetivo principal es diseñar un sistema **escalable, organizado y mantenible**, aplicando **Patrones de Diseño de Software**.
 
-En la primera parte del proyecto se aplicó el patrón **Factory Method**, y en esta segunda parte se implementa el patrón estructural **Adapter** para integrar información externa.
+- En la **primera parte** se implementó el patrón **Factory Method**
+- En la **segunda parte** se implementó el patrón **Adapter**
+- En la **tercera parte** se implementa el patrón **Observer**
 
 ---
 
@@ -32,12 +34,14 @@ Diseñar un sistema que permita representar las relaciones académicas entre est
 - Cada participación en un proyecto tiene una **calificación individual**.
 - Si **50% o más de las calificaciones son menores a 70**, el proyecto se **cierra automáticamente**.
 
-Además, el sistema debe poder **integrar información externa proveniente del ICCIS**, incluso cuando esa información tenga un formato diferente al utilizado por el sistema interno de la UES.
+Además, el sistema debe poder:
+
+- integrar información externa (ICCIS)
+- reaccionar automáticamente ante cambios en las evaluaciones
 
 ---
-# Modelo de dominio
 
-Las entidades principales del sistema son:
+# Modelo de dominio
 
 | Clase | Descripción |
 |------|-------------|
@@ -50,17 +54,15 @@ Las entidades principales del sistema son:
 | Country | Enum con el país de origen del estudiante |
 | ProjectStatus | Enum con el estado del proyecto |
 
-También se incorpora una clase externa que representa el formato de datos del ICCIS.
+Clase externa:
 
 | Clase | Descripción |
 |------|-------------|
-| ExternalIccisProject | Representa el formato externo de proyectos proporcionado por ICCIS |
+| ExternalIccisProject | Formato externo de proyectos del ICCIS |
 
 ---
 
 # Relaciones principales
-
-Las relaciones del sistema están diseñadas de la siguiente manera.
 
 ## Faculty → Course
 Una facultad puede tener múltiples cursos.
@@ -72,38 +74,38 @@ Un profesor puede dictar varios cursos.
 Un estudiante puede estar inscrito en múltiples cursos.
 
 ## Professor → Project
-Cada profesor solo puede tener un proyecto asociado.
+Cada profesor solo puede tener un proyecto.
 
 ## Course → Project
 Cada proyecto pertenece a un curso.
 
 ## Student ↔ Project
-Los estudiantes participan en proyectos a través de la entidad **ProjectParticipation**.
+Los estudiantes participan en proyectos mediante `ProjectParticipation`.
 
 ---
 
-# Patrones de diseño utilizados
+# Arquitectura del proyecto
 
-## Factory Method
+```text
+ues-system
+│
+├── model
+├── external
+├── adapter
+├── factory
+├── observer
+└── main
 
-En la primera parte del proyecto se utilizó el patrón creacional **Factory Method**, el cual permite centralizar la creación de objetos del dominio.
+Patrones de diseño utilizados
+1. Factory Method (Creacional)
 
-La fábrica es responsable de crear:
+Permite centralizar la creación de objetos.
 
-- estudiantes
-- profesores
-- cursos
-- proyectos
-
-Esto permite:
-
-- reducir el acoplamiento entre clases
-- centralizar reglas de negocio
-- facilitar modificaciones futuras
-
-### Ejemplo de uso
-
-```java
+Ventajas:
+reduce acoplamiento
+centraliza lógica de creación
+facilita mantenimiento
+Ejemplo:
 UniversityFactory factory = new DefaultUniversityFactory();
 
 Professor professor = factory.createProfessor(
@@ -111,40 +113,96 @@ Professor professor = factory.createProfessor(
     "Carlos Ruiz",
     "Investigacion"
 );
+2. Adapter (Estructural)
 
-Student student = factory.createStudent(
-    1L,
-    "Ana",
-    Country.COLOMBIA
-);
+Permite integrar el formato externo del ICCIS con el sistema interno.
 
-# Arquitectura del proyecto
+Problema:
 
-El proyecto está organizado en diferentes paquetes para mantener una separación clara de responsabilidades.
+ICCIS usa un formato diferente al de la UES.
 
-```text
-ues-system
-│
-├── model
-│   ├── Faculty.java
-│   ├── Course.java
-│   ├── Professor.java
-│   ├── Student.java
-│   ├── Project.java
-│   ├── ProjectParticipation.java
-│   ├── Country.java
-│   └── ProjectStatus.java
-│
-├── external
-│   └── ExternalIccisProject.java
-│
-├── adapter
-│   ├── IccisProjectTarget.java
-│   └── IccisProjectAdapter.java
-│
-├── factory
-│   ├── UniversityFactory.java
-│   └── DefaultUniversityFactory.java
-│
-└── main
-    └── App.java
+Solución:
+
+Se implementa un adaptador:
+
+IccisProjectTarget
+IccisProjectAdapter
+Flujo:
+ICCIS → ExternalIccisProject → Adapter → UES
+Beneficios:
+desacopla sistemas
+evita modificar clases internas
+facilita integración externa
+3. Observer (Comportamiento)
+
+Permite que el sistema reaccione automáticamente a cambios en las evaluaciones.
+
+Problema:
+
+Cuando cambian las notas, el proyecto debe evaluarse automáticamente.
+
+Solución:
+
+Se implementa el patrón Observer:
+
+Subject → ProjectParticipation
+Observer → ProjectStatusObserver
+Flujo:
+Cambio de nota
+        ↓
+ProjectParticipation
+        ↓
+notifyObservers()
+        ↓
+ProjectStatusObserver
+        ↓
+evalúa proyecto
+        ↓
+puede cerrarlo
+Beneficios:
+desacopla lógica de negocio
+permite comportamiento dinámico
+mejora escalabilidad
+Regla de evaluación automática
+
+Si el 50% o más de las calificaciones son menores a 70:
+
+ProjectStatus = CLOSED
+
+En caso contrario:
+
+ProjectStatus = ACTIVE
+Ejemplo de comportamiento (Observer)
+p1.setGrade(50); // dispara notificación
+
+// automáticamente:
+→ observer.update()
+→ evalúa proyecto
+→ puede cerrarse
+Diferencia entre las partes del proyecto
+Parte	Patrón	Enfoque
+1	Factory Method	creación
+2	Adapter	estructura
+3	Observer	comportamiento
+Decisiones de diseño
+
+Se eligió Observer porque el sistema requiere reaccionar automáticamente a cambios en las evaluaciones, lo cual representa un caso claro de notificación de eventos.
+
+Se eligió Adapter para desacoplar la estructura externa del ICCIS del modelo interno.
+
+Se utilizó Factory Method para mantener una creación organizada de objetos.
+
+Tecnologías utilizadas
+Java
+Programación Orientada a Objetos
+Patrones de Diseño (Creacional, Estructural, Comportamiento)
+Posibles mejoras
+persistencia en base de datos
+API REST
+autenticación
+control de acceso (Proxy)
+múltiples estrategias de evaluación (Strategy)
+Autor
+
+Proyecto académico – Patrones de Diseño
+Asturias Corporación Universitaria

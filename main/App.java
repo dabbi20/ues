@@ -1,32 +1,23 @@
-package main;
+ProjectParticipation p1 = new ProjectParticipation(80);
+ProjectParticipation p2 = new ProjectParticipation(60);
+ProjectParticipation p3 = new ProjectParticipation(65);
+ProjectParticipation p4 = new ProjectParticipation(90);
 
-import factory.DefaultUniversityFactory;
-import factory.UniversityFactory;
-import model.*;
-package main;
+List<ProjectParticipation> participations =
+        List.of(p1, p2, p3, p4);
 
-import adapter.IccisProjectAdapter;
-import adapter.IccisProjectTarget;
-import external.ExternalIccisProject;
+Project project = new Project(1L, "Proyecto Amazonia", participations);
 
-public class App {
+// 🔥 crear observer
+ProjectStatusObserver observer = new ProjectStatusObserver(project);
 
-    public static void main(String[] args) {
+// 🔥 registrar observer
+p1.addObserver(observer);
+p2.addObserver(observer);
+p3.addObserver(observer);
+p4.addObserver(observer);
 
-        ExternalIccisProject externalProject =
-                new ExternalIccisProject(
-                        "ICCIS-101",
-                        "Amazonic Medicinal Plants Research",
-                        "Software Design",
-                        "Carlos Ruiz"
-                );
+// 🔥 cambiar nota
+p1.setGrade(50);
 
-        IccisProjectTarget adaptedProject = new IccisProjectAdapter(externalProject);
-
-        System.out.println("Proyecto adaptado al sistema UES:");
-        System.out.println("ID: " + adaptedProject.getProjectId());
-        System.out.println("Titulo: " + adaptedProject.getProjectTitle());
-        System.out.println("Curso: " + adaptedProject.getCourseName());
-        System.out.println("Profesor: " + adaptedProject.getProfessorName());
-    }
-}
+System.out.println(project.getStatus());
