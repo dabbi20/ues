@@ -1,47 +1,44 @@
 package model;
 
-public class Project {
+import observer.Observer;
+import java.util.List;
+
+public class Project implements Observer {
 
     private Long id;
     private String title;
-    private Course course;
-    private Professor professor;
+    private List<ProjectParticipation> participations;
     private ProjectStatus status;
 
-    public Project(Long id, String title, Course course, Professor professor) {
+    public Project(Long id, String title, List<ProjectParticipation> participations) {
         this.id = id;
         this.title = title;
-        this.course = course;
-        this.professor = professor;
+        this.participations = participations;
         this.status = ProjectStatus.ACTIVE;
     }
 
-    public Long getId() {
-        return id;
+    @Override
+    public void update() {
+        evaluateProject();
     }
 
-    public String getTitle() {
-        return title;
-    }
+    public void evaluateProject() {
+        int total = participations.size();
+        int lowGrades = 0;
 
-    public Course getCourse() {
-        return course;
-    }
+        for (ProjectParticipation p : participations) {
+            if (p.isLowGrade()) {
+                lowGrades++;
+            }
+        }
 
-    public Professor getProfessor() {
-        return professor;
+        if (total > 0 && (lowGrades * 100 / total) >= 50) {
+            status = ProjectStatus.CLOSED;
+            System.out.println("Proyecto cerrado automáticamente por bajo rendimiento");
+        }
     }
 
     public ProjectStatus getStatus() {
         return status;
-    }
-
-    @Override
-    public String toString() {
-        return "Project{id=" + id +
-                ", title='" + title + '\'' +
-                ", course=" + course.getName() +
-                ", professor=" + professor.getName() +
-                ", status=" + status + '}';
     }
 }
